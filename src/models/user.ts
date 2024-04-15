@@ -1,12 +1,12 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
-enum Roles {User, Admin}
+// enum Roles {User, Admin}
 
 interface IUser {
   email: string;
   password: string;
   name: string;
-  role: string;
+  // role: string;
   posts: any[]
 }
 
@@ -23,10 +23,10 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true
   },
-  role: {
-    type: String,
-    default: Roles.User.toString()
-  },
+  // role: {
+  //   type: String,
+  //   default: Roles.User.toString()
+  // },
   posts: [{
     type: Schema.Types.ObjectId,
     ref: 'Post'
