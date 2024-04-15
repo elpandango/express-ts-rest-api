@@ -1,14 +1,6 @@
-import mongoose, { Schema, Types } from 'mongoose';
-
+import mongoose, {Schema} from 'mongoose';
+import {IUser} from "../interfaces/user";
 // enum Roles {User, Admin}
-
-interface IUser {
-  email: string;
-  password: string;
-  name: string;
-  // role: string;
-  posts: any[]
-}
 
 const userSchema = new Schema<IUser>({
   email: {

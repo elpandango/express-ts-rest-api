@@ -1,21 +1,31 @@
 import {Router} from 'express';
 import {body} from 'express-validator';
 
-import {createPost} from '../controllers/feed';
+import {isAuth} from "../middleware/is-auth";
+import {createPost, getPosts} from '../controllers/feed';
 
 const router = Router();
 
-router.post('/post',
-  [
-    body('title').trim().isLength({min: 5}),
-    body('content').trim().isLength({min: 5}),
-  ],
+router.get('/posts', isAuth, getPosts);
+
+router.post('/post', isAuth,
+  // [
+  //   body('title').trim().isLength({min: 5}),
+  //   body('content').trim().isLength({min: 5}),
+  // ],
   createPost);
 
-// router.get('/', getTodos);
+// router.get('/post/:postId',
+//   isAuth, feedController.getPost);
 //
-// router.patch('/:id', updateTodo);
+// router.put('/post/:postId',
+//   isAuth, [
+//     body('title').trim().isLength({min: 5}),
+//     body('content').trim().isLength({min: 5}),
+//   ], feedController.updatePost);
 //
-// router.delete('/:id', deleteTodo);
+// router.delete('/post/:postId',
+//   isAuth,
+//   feedController.deletePost);
 
 export default router;

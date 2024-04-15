@@ -1,28 +1,18 @@
-import mongoose, { Schema, Types } from 'mongoose';
-
-interface IPost {
-  title: string;
-  imageUrl: string;
-  content: string;
-  createdAt: Date;
-  creator: Types.ObjectId
-}
+import mongoose, {Schema} from 'mongoose';
+import {IPost} from "../interfaces/post";
 
 const postSchema = new Schema<IPost>({
   title: {
     type: String,
     required: true
   },
-  imageUrl: {
-    type: String,
-    required: true
-  },
+  // imageUrl: {
+  //   type: String,
+  //   required: true
+  // },
   content: {
     type: String,
     required: true
-  },
-  createdAt: {
-    type: Date,
   },
   creator: {
     type: Schema.Types.ObjectId,
