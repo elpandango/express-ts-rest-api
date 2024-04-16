@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {body} from 'express-validator';
 
 import {signup, login} from '../controllers/auth';
-import {User} from '../models/user';
+import {UserModel} from '../models/user';
 
 const router: Router = Router();
 
@@ -11,7 +11,7 @@ router.put('/signup', [
       .isEmail()
       .withMessage('Please enter a valid email.')
       .custom(value => {
-        return User.findOne({email: value})
+        return UserModel.findOne({email: value})
           .then(userDoc => {
             if (userDoc) {
               return Promise.reject('E-Mail address already exists!');

@@ -1,12 +1,13 @@
 import express, {Request, Response, NextFunction} from 'express';
 import mongoose from "mongoose";
-import {json} from 'body-parser';
+import bodyParser from 'body-parser';
 import path from "path";
 import dotenv from 'dotenv';
 dotenv.config();
 
-// const multer = require('multer');
+import multer from 'multer';
 
+import feedRoutes from './routes/feed';
 import adminRoutes from './routes/feed';
 import authRoutes from './routes/auth';
 
@@ -14,43 +15,47 @@ const app = express();
 import http from 'http';
 const server = http.createServer(app);
 
-// const fileStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'images');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, new Date().toISOString() + '-' + file.originalname);
-//   }
-// });
-//
-// const fileFilter = (req, file, cb) => {
-//   if (file.mimetype === 'image/png' ||
-//     file.mimetype === 'image/jpg' ||
-//     file.mimetype === 'image/jpeg') {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  }
+});
 
-app.use(json());
-// app.use(multer({
-//   storage: fileStorage,
-//   fileFilter: fileFilter
-// })
-//   .single('image'));
-// app.use(express.static(path.join(__dirname, 'public')));
-// app.use('/images', express.static(path.join(__dirname, 'images')));
+const fileFilter = (req: any, file: any, cb: any) => {
+  if (file.mimetype === 'image/png' ||
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(multer({
+  storage: fileStorage,
+  fileFilter: fileFilter
+})
+  .single('image'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   next();
 });
 
 app.use('/admin', adminRoutes);
 app.use('/auth', authRoutes);
+app.use('/feed', feedRoutes);
 
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
