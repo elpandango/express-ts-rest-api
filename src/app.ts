@@ -24,24 +24,25 @@ const fileStorage = multer.diskStorage({
   }
 });
 
-const fileFilter = (req: any, file: any, cb: any) => {
-  if (file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpg' ||
-      file.mimetype === 'image/jpeg') {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
+// const fileFilter = (req: any, file: any, cb: any) => {
+//   if (file.mimetype === 'image/png' ||
+//       file.mimetype === 'image/jpg' ||
+//       file.mimetype === 'image/webp' ||
+//       file.mimetype === 'image/jpeg') {
+//     cb(null, true);
+//   } else {
+//     cb(null, false);
+//   }
+// };
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use(multer({
-  storage: fileStorage,
-  fileFilter: fileFilter
-})
-  .single('image'));
+// app.use(multer({
+//   storage: fileStorage,
+//   fileFilter: fileFilter
+// })
+//   .single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

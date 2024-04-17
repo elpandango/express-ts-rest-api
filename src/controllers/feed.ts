@@ -42,20 +42,23 @@ export const createPost: RequestHandler = async (req, res, next): Promise<void> 
             error.statusCode = 422;
             throw error;
         }
-        // if (!(<any>req).file) {
-        //   const error = new Error('No image provided.');
-        //   (<any>error).statusCode = 422;
-        //   throw error;
-        // }
+        if (!(<any>req).file) {
+            const error = new Error('No image provided.');
+            (<any>error).statusCode = 422;
+            throw error;
+        }
 
-        // const imageUrl = (<any>req).file.path;
+        const filePath = (<any>req).file.path;
+        const data = fs.readFileSync(filePath);
+        const base64Data = Buffer.from(data).toString('base64');
+        const imageUrl = `data:image/jpeg;base64,${base64Data}`;
         const title = req.body.title;
-        const imageUrl = req.body.imageUrl;
         const content = req.body.content;
+        // const imageUrl = (<any>req).file.path;
         const post = new PostModel({
             title,
             content,
-            imageUrl: imageUrl,
+            imageUrl,
             creator: (<any>req).userId.toString(),
         });
 
@@ -64,7 +67,6 @@ export const createPost: RequestHandler = async (req, res, next): Promise<void> 
 
         if (user) {
             user.posts.push(post);
-            // savedUser = await user.save();
             await user.save();
 
             res.status(201).json({
@@ -106,62 +108,75 @@ export const getPost: RequestHandler = async (req, res, next): Promise<void> => 
     }
 };
 
-// exports.updatePost = async (req, res, next) => {
-//   const postId = req.params.postId;
-//   const errors = validationResult(req);
-//   if (errors?.errors.length > 0) {
-//     const error = new Error('Validation failed, entered data is incorrect.');
-//     error.statusCode = 422;
-//     throw error;
-//   }
-//   const title = req.body.title;
-//   const content = req.body.content;
-//   let imageUrl = req.body.image;
-//   if (req.file) {
-//     imageUrl = req.file.path;
-//   }
-//   if (!imageUrl) {
-//     const error = new Error('No file picked.');
-//     error.statusCode = 422;
-//     throw error;
-//   }
-//
-//   try {
-//     const post = await Post.findById(postId).populate('creator');
-//     if (!post) {
-//       const error = new Error('Could not find post.');
-//       error.statusCode = 404;
-//       throw error;
-//     }
-//     if (post.creator._id.toString() !== req.userId.toString()) {
-//       const error = new Error('Not Authorized!');
-//       error.statusCode = 403;
-//       throw error;
-//     }
-//     if (imageUrl !== post.imageUrl) {
-//       clearImage(post.imageUrl);
-//     }
-//     post.title = title;
-//     post.imageUrl = imageUrl;
-//     post.content = content;
-//     const result = await post.save();
-//     io.getIO().emit('posts', {
-//       action: 'update',
-//       post: result
-//     });
-//     res.status(200)
-//       .json({
-//         message: 'Post updated.',
-//         post: result
-//       });
-//   } catch (err) {
-//     if (!err.statusCode) {
-//       err.statusCode = 500;
-//     }
-//     next(err);
-//   }
-// };
-//
+export const updatePost: RequestHandler = async (req, res, next) => {
+    const postId = req.params.postId;
+    const errors: any = validationResult(req);
+    if (errors?.errors.length > 0) {
+        const error: CustomError = new Error('Validation failed, entered data is incorrect.');
+        error.statusCode = 422;
+        throw error;
+    }
+    const title = req.body.title;
+    const content = req.body.content;
+    // let imageUrl = req.body.image;
+    let data;
+    let base64Data;
+    let imageUrl;
+
+    const filePath = (<any>req)?.file?.path;
+    if (filePath) {
+        data = fs.readFileSync(filePath);
+        base64Data = Buffer.from(data).toString('base64');
+        imageUrl = `data:image/jpeg;base64,${base64Data}`;
+    }
+
+
+    // if (req.file) {
+    //     imageUrl = req.file.path;
+    // }
+    // if (!imageUrl) {
+    //     const error: CustomError = new Error('No file picked.');
+    //     error.statusCode = 422;
+    //     throw error;
+    // }
+
+    try {
+        const post = await PostModel.findById(postId).populate('creator');
+
+        // console.log(imageUrl);
+        // console.log(post.imageUrl);
+
+        if (!post) {
+            const error: CustomError = new Error('Could not find post.');
+            error.statusCode = 404;
+            throw error;
+        }
+        if (post.creator._id.toString() !== (<any>req).userId.toString()) {
+            const error: CustomError = new Error('Not Authorized!');
+            error.statusCode = 403;
+            throw error;
+        }
+        if (imageUrl) {
+            // clearImage(post.imageUrl);
+            post.imageUrl = imageUrl;
+        }
+        post.title = title;
+        post.content = content;
+        const result = await post.save();
+
+        res.status(200)
+            .json({
+                message: 'Post updated.',
+                post: result
+            });
+    } catch (err: any) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
 // exports.deletePost = async (req, res, next) => {
 //   const postId = req.params.postId;
 //   try {

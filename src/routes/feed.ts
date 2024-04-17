@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {body} from 'express-validator';
 
 import {isAuth} from "../middleware/is-auth";
-import { getPosts, createPost, getPost} from '../controllers/feed';
+import { getPosts, createPost, getPost, updatePost} from '../controllers/feed';
 
 const router = Router();
 
@@ -18,12 +18,12 @@ router.post('/post', isAuth,
 router.get('/post/:postId',
   isAuth, getPost);
 
-// router.put('/post/:postId',
-//   isAuth, [
-//     body('title').trim().isLength({min: 5}),
-//     body('content').trim().isLength({min: 5}),
-//   ], feedController.updatePost);
-//
+router.put('/post/:postId',
+  isAuth, [
+    body('title').trim().isLength({min: 5}),
+    body('content').trim().isLength({min: 5}),
+  ], updatePost);
+
 // router.delete('/post/:postId',
 //   isAuth,
 //   feedController.deletePost);
