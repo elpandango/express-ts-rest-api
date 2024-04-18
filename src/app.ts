@@ -8,8 +8,8 @@ dotenv.config();
 import multer from 'multer';
 
 import feedRoutes from './routes/feed';
-import adminRoutes from './routes/feed';
 import authRoutes from './routes/auth';
+import userRoutes from './routes/user';
 
 const app = express();
 import http from 'http';
@@ -17,32 +17,32 @@ const server = http.createServer(app);
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'images');
+    cb(null, 'dist/images');
   },
   filename: (req, file, cb) => {
     cb(null, new Date().toISOString() + '-' + file.originalname);
   }
 });
 
-// const fileFilter = (req: any, file: any, cb: any) => {
-//   if (file.mimetype === 'image/png' ||
-//       file.mimetype === 'image/jpg' ||
-//       file.mimetype === 'image/webp' ||
-//       file.mimetype === 'image/jpeg') {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//   }
-// };
+const fileFilter = (req: any, file: any, cb: any) => {
+  if (file.mimetype === 'image/png' ||
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'image/webp' ||
+      file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// app.use(multer({
-//   storage: fileStorage,
-//   fileFilter: fileFilter
-// })
-//   .single('image'));
+app.use(multer({
+  storage: fileStorage,
+  fileFilter: fileFilter
+})
+  .single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
@@ -54,10 +54,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/admin', adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/feed', feedRoutes);
-
+app.use('/user', userRoutes);
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   const status = (<any>error).statusCode || 500;

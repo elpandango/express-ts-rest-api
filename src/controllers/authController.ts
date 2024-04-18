@@ -42,6 +42,7 @@ export const login: RequestHandler = async (req, res, next): Promise<void> => {
     const email = req.body.email;
     const password = req.body.password;
     let loadedUser;
+
     try {
         const user = await UserModel.findOne({email: email});
         if (!user) {
@@ -60,9 +61,10 @@ export const login: RequestHandler = async (req, res, next): Promise<void> => {
                 email: loadedUser.email,
                 userId: loadedUser._id.toString()
             }, 'somesupersecretsecret'
-            , {expiresIn: '1h'})
+            , {expiresIn: '5h'})
         res.status(200).json({
             token: token,
+            user: user,
             userId: loadedUser._id.toString()
         });
         return;

@@ -1,25 +1,26 @@
 import jwt from 'jsonwebtoken';
-import {RequestHandler} from 'express';
+import {RequestHandler, Request, Response, NextFunction} from 'express';
+import {generateError} from "../utils/error";
 
-export const isAuth: RequestHandler = (req, res, next) => {
-  const authHeader = req.get('Authorization');
+interface DecodedToken {
+  userId: string;
+}
+
+export const isAuth: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader: string | undefined = req.get('Authorization');
   if (!authHeader) {
-    const error = new Error('Not authenticated.');
-    (<any>error).statusCode = 401;
-    throw error;
+    generateError({statusCode: 401, message: 'Not authenticated'});
   }
-  const token: string = authHeader.split(' ')[1];
-  let decodedToken: any;
+  const token: string = authHeader!.split(' ')[1];
+  let decodedToken: DecodedToken;
   try {
-    decodedToken = jwt.verify(token, 'somesupersecretsecret');
+    decodedToken = jwt.verify(token, 'somesupersecretsecret') as DecodedToken;
   } catch (err: any) {
     err.statusCode = 500;
     throw err;
   }
   if (!decodedToken) {
-    const error = new Error('Not authenticated.');
-    (<any>error).statusCode = 401;
-    throw error;
+    generateError({statusCode: 401, message: 'Not authenticated'});
   }
   (<any>req).userId = decodedToken.userId;
   next();

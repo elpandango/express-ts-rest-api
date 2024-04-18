@@ -1,6 +1,6 @@
-import mongoose, {Schema, Types} from 'mongoose';
+import mongoose, {Schema, Types, Document} from 'mongoose';
 
-export interface Post {
+export interface Post extends Document {
     title: string;
     imageUrl: string;
     content: string;
