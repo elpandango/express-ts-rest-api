@@ -1,42 +1,8 @@
-import {UserModel} from '../models/user';
-import {RequestHandler} from 'express';
-import {Result, validationResult} from 'express-validator';
-
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import {CustomError} from "../interfaces/error";
-
-export const signup: RequestHandler = async (req, res, next): Promise<void> => {
-    try {
-        const errors: Result = validationResult(req);
-        if (!errors.isEmpty()) {
-            const error: CustomError = new Error('Validation failed.');
-            error.statusCode = 422;
-            error.data = errors;
-            throw error;
-        }
-
-        const email = req.body?.email;
-        const name = req.body?.name;
-        const password = req.body?.password;
-        const hashedPw: string = await bcrypt.hash(password, 12);
-        const user = new UserModel({
-            email: email,
-            password: hashedPw,
-            name: name
-        });
-        const result = await user.save();
-        res.status(201).json({
-            message: 'User created!',
-            userId: result._id
-        });
-    } catch (err: any) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
-    }
-};
+import {RequestHandler} from "express";
+import {UserModel} from "../../models/user";
+import {CustomError} from "../../interfaces/error";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const login: RequestHandler = async (req, res, next): Promise<void> => {
     const email = req.body.email;

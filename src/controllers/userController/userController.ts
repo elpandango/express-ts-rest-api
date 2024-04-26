@@ -1,4 +1,4 @@
-import {UserModel} from '../models/user';
+import {UserModel} from '../../models/user';
 import {RequestHandler} from "express";
 
 export const getCurrentUser: RequestHandler = async (req, res, next): Promise<void> => {
