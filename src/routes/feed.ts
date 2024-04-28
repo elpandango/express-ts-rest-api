@@ -6,7 +6,7 @@ import { postController } from '../controllers/postController/postController';
 
 const router = Router();
 
-router.get('/posts', isAuth, postController.getPosts);
+router.get('/posts', postController.getPosts);
 
 router.post('/post', isAuth,
   [

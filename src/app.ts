@@ -63,8 +63,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   const message: string = error.message;
   const data = (<any>error).data;
 
-  console.log('!!!ERROR!!!', error);
-
   res.status(status).json({
     message: message,
     data: data
